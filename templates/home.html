@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>URL Shortener</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>URL Shortener</h1>
+        <form action="/shorten" method="post" class="url-form">
+            <input type="text" name="url" placeholder="Enter a URL" required>
+            <button type="submit">Shorten</button>
+        </form>
+        {{if .Error}}
+        <div class="error">{{.Error}}</div>
+        {{end}}
+    </div>
+    <script src="/static/js/script.js"></script>
+</body>
+</html>
