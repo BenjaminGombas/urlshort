@@ -8,11 +8,11 @@
     <div class="container">
         <h1>URL Shortened</h1>
         <div class="result">
-            <p><strong>Original URL:</strong> {{.LongURL}}</p>
+            <p><strong>Original URL:</strong> {{.LongURL | html}}</p>
             <p>
                 <strong>Short URL:</strong> 
-                <a href="{{.ShortURL}}" target="_blank">{{.ShortURL}}</a>
-                <button class="copy-btn" data-url="{{.ShortURL}}">Copy</button>
+                <a href="{{.ShortURL}}" target="_blank">{{.ShortURL | html}}</a>
+                <button class="copy-btn" data-url="{{.ShortURL | html}}">Copy</button>
             </p>
         </div>
         <div class="actions">

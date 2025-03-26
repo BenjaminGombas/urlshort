@@ -8,7 +8,9 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -82,18 +84,11 @@ func (s *URLStore) Get(shortCode string) (string, bool) {
 
 // Set stores a URL with a generated short code
 func (s *URLStore) Set(longURL string) (string, error) {
-	// check if URL already exists
-	var shortCode string
-	err := s.db.QueryRow("SELECT short_code FROM urls WHERE original_url = ?", longURL).Scan(&shortCode)
-	if err == nil {
-		return shortCode, nil // URL already exists
-	}
-
 	// Generate new short code
-	shortCode = generateShortCode(longURL)
+	shortCode := generateShortCode(longURL)
 
 	// Insert into database
-	_, err = s.db.Exec("INSERT INTO urls (short_code, original_url) VALUES (?, ?)", shortCode, longURL)
+	_, err := s.db.Exec("INSERT INTO urls (short_code, original_url) VALUES (?, ?)", shortCode, longURL)
 	if err != nil {
 		return "", err
 	}
@@ -121,6 +116,34 @@ func generateShortCode(url string) string {
 	// Take first 8 characters for the short code
 	return encoded[:8]
 
+}
+
+// This function checks if a string is a valid URL
+func validateURL(rawURL string) (string, error) {
+
+	// Parse the URL
+	parsedURL, err := url.Parse(rawURL)
+	if err != nil {
+		return "", fmt.Errorf("invalid URL format: %v", err)
+	}
+
+	// Check for minimum required parts
+	if parsedURL.Scheme == "" || parsedURL.Host == "" {
+		return "", fmt.Errorf("URL missing scheme or host")
+	}
+
+	// Check for valid scheme
+	if parsedURL.Scheme != "http" && parsedURL.Scheme != "https" {
+		return "", fmt.Errorf("URL scheme must be http or https")
+	}
+
+	// Check for valid host (at least one dot and no spaces)
+	if !strings.Contains(parsedURL.Host, ".") || strings.Contains(parsedURL.Host, " ") {
+		return "", fmt.Errorf("invalid host in URL")
+	}
+
+	// Return the normalized URL
+	return parsedURL.String(), nil
 }
 
 var (
@@ -184,13 +207,20 @@ func shortenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Add http:// prefix if missing
-	if !hasProtocol(longURL) {
-		longURL = "http://" + longURL
+	// Validate the URL
+	validatedURL, err := validateURL(longURL)
+	if err != nil {
+		data := struct {
+			Error string
+		}{
+			Error: "Invalid URL: " + err.Error(),
+		}
+		templates.ExecuteTemplate(w, "home.html", data)
+		return
 	}
 
 	// Generate short code
-	shortCode, err := store.Set(longURL)
+	shortCode, err := store.Set(validatedURL)
 	if err != nil {
 		data := struct {
 			Error string
@@ -228,10 +258,6 @@ func statsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Fprintf(w, "Short URL /%s has been accessed %d times", shortCode, hits)
-}
-
-func hasProtocol(url string) bool {
-	return len(url) > 7 && (url[:7] == "http://" || url[:8] == "https://")
 }
 
 func main() {
