@@ -2,19 +2,39 @@
 <html>
 <head>
     <title>URL Shortener</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/css/style.css?v=1.1">
 </head>
 <body>
     <div class="container">
+        <div class="decoration decoration-1"></div>
+        <div class="decoration decoration-2"></div>
+        
         <h1>URL Shortener</h1>
-        <form action="/shorten" method="post" class="url-form">
-            <input type="text" name="url" placeholder="Enter a URL" required>
-            <button type="submit">Shorten</button>
-        </form>
+        
         {{if .Error}}
         <div class="error">{{.Error}}</div>
         {{end}}
+        
+        <form action="/shorten" method="post" class="url-form">
+            <input type="text" name="url" placeholder="Enter a URL to shorten" required>
+            <button type="submit">Shorten</button>
+        </form>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-text">Quick & Simple</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔒</div>
+                <div class="feature-text">Secure Links</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📊</div>
+                <div class="feature-text">Track Click Count</div>
+            </div>
+        </div>
     </div>
-    <script src="/static/js/script.js"></script>
 </body>
 </html>

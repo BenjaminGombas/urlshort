@@ -2,18 +2,20 @@
 <html>
 <head>
     <title>URL Shortened</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/css/style.css?v=1.1">
 </head>
 <body>
     <div class="container">
         <h1>URL Shortened</h1>
         <div class="result">
-            <p><strong>Original URL:</strong> {{.LongURL | html}}</p>
-            <p>
-                <strong>Short URL:</strong> 
-                <a href="{{.ShortURL}}" target="_blank">{{.ShortURL | html}}</a>
+            <div class="url-info">
+                <p><strong>Original URL:</strong> {{.LongURL | html}}</p>
+            </div>
+            <div class="short-url-box">
+                <div class="short-url">{{.ShortURL | html}}</div>
                 <button class="copy-btn" data-url="{{.ShortURL | html}}">Copy</button>
-            </p>
+            </div>
         </div>
         <div class="actions">
             <a href="/" class="btn">Shorten Another URL</a>

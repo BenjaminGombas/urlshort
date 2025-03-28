@@ -1,75 +1,186 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Poppins', sans-serif;
     line-height: 1.6;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #333;
 }
 
 .container {
-    width: 80%;
+    width: 90%;
     max-width: 600px;
     margin: 2rem auto;
-    padding: 2rem;
+    padding: 2.5rem;
     background-color: white;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
 }
 
 h1 {
     text-align: center;
-    color: #333;
+    color: #5a67d8;
+    margin-bottom: 30px;
+    font-weight: 600;
 }
 
 .url-form {
     display: flex;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 
 input[type="text"] {
     flex: 1;
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 3px 0 0 3px;
+    padding: 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px 0 0 8px;
+    font-size: 16px;
+    transition: all 0.3s;
+}
+
+input[type="text"]:focus {
+    border-color: #5a67d8;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.2);
 }
 
 button {
-    padding: 0.5rem 1rem;
-    background-color: #4caf50;
+    padding: 15px 25px;
+    background-color: #5a67d8;
     color: white;
     border: none;
     cursor: pointer;
-    border-radius: 0 3px 3px 0;
+    border-radius: 0 8px 8px 0;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+button:hover {
+    background-color: #4c51bf;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(90, 103, 216, 0.3);
 }
 
 .result {
-    background-color: #f9f9f9;
-    padding: 1rem;
-    border-radius: 3px;
-    margin-bottom: 1rem;
+    background-color: #f7fafc;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
 }
 
 .copy-btn {
     margin-left: 0.5rem;
-    padding: 0.2rem 0.5rem;
-    font-size: 0.8rem;
-    border-radius: 3px;
+    padding: 8px 15px;
+    font-size: 14px;
+    border-radius: 6px;
+    background-color: #5a67d8;
+    color: white;
+    transition: background-color 0.3s;
+}
+
+.copy-btn:hover {
+    background-color: #4c51bf;
 }
 
 .error {
-    color: #f44336;
-    margin-top: 1rem;
+    color: #e53e3e;
+    margin-top: 15px;
+    background: #fff5f5;
+    padding: 12px;
+    border-radius: 6px;
+    border-left: 4px solid #e53e3e;
 }
 
 .actions {
     text-align: center;
+    margin-top: 20px;
 }
 
 .btn {
     display: inline-block;
-    padding: 0.5rem 1rem;
-    background-color: #2196f3;
+    padding: 12px 20px;
+    background-color: #5a67d8;
     color: white;
     text-decoration: none;
-    border-radius: 3px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn:hover {
+    background-color: #4c51bf;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(90, 103, 216, 0.3);
+}
+
+/* Additional styles for the short URL display */
+.short-url-box {
+    display: flex;
+    align-items: center;
+    background: #ebf4ff;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.short-url {
+    flex: 1;
+    font-weight: 600;
+    color: #5a67d8;
+    margin-right: 10px;
+    word-break: break-all;
+}
+
+/* Feature section styles */
+.features {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 30px;
+    text-align: center;
+}
+
+.feature {
+    padding: 15px;
+}
+
+.feature-icon {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #5a67d8;
+}
+
+.feature-text {
+    font-size: 14px;
+    color: #718096;
+}
+
+/* Decorative elements */
+.decoration {
+    position: absolute;
+    background: #5a67d8;
+    opacity: 0.1;
+    border-radius: 50%;
+}
+
+.decoration-1 {
+    width: 150px;
+    height: 150px;
+    top: -50px;
+    left: -50px;
+}
+
+.decoration-2 {
+    width: 100px;
+    height: 100px;
+    bottom: -30px;
+    right: -30px;
 }
