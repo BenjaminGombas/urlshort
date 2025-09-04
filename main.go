@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
@@ -19,6 +20,19 @@ import (
 // URLStore manages URL storage
 type URLStore struct {
 	db *sql.DB
+}
+
+// Health check response structs
+type HealthResponse struct {
+	Status    string            `json:"status"`
+	Timestamp string            `json:"timestamp"`
+	Details   map[string]string `json:"details,omitempty"`
+}
+
+type DetailedHealthResponse struct {
+	Status     string                 `json:"status"`
+	Timestamp  string                 `json:"timestamp"`
+	Components map[string]interface{} `json:"components"`
 }
 
 // NewURLStore creates a new URLStore
@@ -149,6 +163,7 @@ func validateURL(rawURL string) (string, error) {
 var (
 	store     *URLStore
 	templates = template.Must(template.ParseGlob("templates/*.html"))
+	startTime = time.Now()
 )
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
@@ -260,6 +275,92 @@ func statsHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Short URL /%s has been accessed %d times", shortCode, hits)
 }
 
+// Basic health endpoint
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	response := HealthResponse{
+		Status:    "UP",
+		Timestamp: time.Now().Format(time.RFC3339),
+	}
+
+	json.NewEncoder(w).Encode(response)
+}
+
+// Database health check
+func healthDatabaseHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Test database connectivity
+	err := store.db.Ping()
+	status := "UP"
+	details := make(map[string]string)
+
+	if err != nil {
+		status = "DOWN"
+		details["error"] = err.Error()
+		w.WriteHeader(http.StatusServiceUnavailable)
+	} else {
+		details["database"] = "SQLite connection successful"
+	}
+
+	response := HealthResponse{
+		Status:    status,
+		Timestamp: time.Now().Format(time.RFC3339),
+		Details:   details,
+	}
+
+	json.NewEncoder(w).Encode(response)
+}
+
+// Detailed health with metrics
+func healthDetailedHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Get database stats
+	var totalURLs int
+	store.db.QueryRow("SELECT COUNT(*) FROM urls").Scan(&totalURLs)
+
+	var totalHits int
+	store.db.QueryRow("SELECT COALESCE(SUM(hits), 0) FROM urls").Scan(&totalHits)
+
+	// Test database connectivity
+	dbStatus := "UP"
+	if err := store.db.Ping(); err != nil {
+		dbStatus = "DOWN"
+		w.WriteHeader(http.StatusServiceUnavailable)
+	}
+
+	components := map[string]interface{}{
+		"database": map[string]interface{}{
+			"status": dbStatus,
+			"type":   "SQLite",
+		},
+		"metrics": map[string]interface{}{
+			"total_urls":     totalURLs,
+			"total_hits":     totalHits,
+			"uptime_seconds": time.Since(startTime).Seconds(),
+		},
+		"application": map[string]interface{}{
+			"status":  "UP",
+			"version": "1.0.0",
+		},
+	}
+
+	status := "UP"
+	if dbStatus == "DOWN" {
+		status = "DOWN"
+	}
+
+	response := DetailedHealthResponse{
+		Status:     status,
+		Timestamp:  time.Now().Format(time.RFC3339),
+		Components: components,
+	}
+
+	json.NewEncoder(w).Encode(response)
+}
+
 func main() {
 	var err error
 	// Initialize the URL store with a database file
@@ -273,6 +374,9 @@ func main() {
 	http.HandleFunc("/", homeHandler)
 	http.HandleFunc("/shorten", shortenHandler)
 	http.HandleFunc("/stats", statsHandler)
+	http.HandleFunc("/health", healthHandler)
+	http.HandleFunc("/health/database", healthDatabaseHandler)
+	http.HandleFunc("/health/detailed", healthDetailedHandler)
 
 	// Serve static files
 	fs := http.FileServer(http.Dir("static"))
